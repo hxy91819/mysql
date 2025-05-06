@@ -30,7 +30,7 @@ var (
 func ColumnNameByField(field *reflect.StructField) string {
 	name, ok := field.Tag.Lookup(EntityTagColumn)
 	if ok {
-		return name
+		return "`" + name + "`"
 	}
 
 	matches := entityFieldRegex.FindAllStringSubmatch(field.Name, -1)
@@ -39,7 +39,8 @@ func ColumnNameByField(field *reflect.StructField) string {
 		elems[i] = strings.ToLower(match[1])
 	}
 
-	return strings.Join(elems, EntityColumnSep)
+	defaultName := strings.Join(elems, EntityColumnSep)
+	return "`" + defaultName + "`"
 }
 
 func ReflectColNamesByType(ret reflect.Type) []string {
