@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"database/sql"
+	"reflect"
 	"strconv"
 	"testing"
 	"time"
@@ -58,6 +59,22 @@ func TestSimpleQueryEntitiesAnd(t *testing.T) {
 	t.Log(err, NoRowsError(err))
 	for i, entity := range entityList {
 		t.Log(i, entity, *entity.ID, *entity.AddTime, *entity.EditTime)
+	}
+}
+
+func TestColumnNameByFieldQuoting(t *testing.T) {
+	type Reserved struct {
+		Key  string `column:"key"`
+		Data int
+	}
+	st := reflect.TypeOf(Reserved{})
+	fKey, _ := st.FieldByName("Key")
+	if got := ColumnNameByField(&fKey); got != "`key`" {
+		t.Errorf("ColumnNameByField for tag, want \"`key`\", got %s", got)
+	}
+	fData, _ := st.FieldByName("Data")
+	if got := ColumnNameByField(&fData); got != "`data`" {
+		t.Errorf("ColumnNameByField default, want \"`data`\", got %s", got)
 	}
 }
 
